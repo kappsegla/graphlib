@@ -60,19 +60,19 @@ public class Graph {
         System.out.println(path.stream().map(Object::toString).collect(Collectors.joining(" - ")));
     }
 
-    int[] dist;
-    int[] prev;
+    int[] shortestDistanceToVertex;
+    int[] previousVertex;
 
     public void calculateShortestDistances(int start){
         final int V = vertices.size();
-        dist = new int[V];    //Shortest distance to reach this vertex
-        prev = new int[V];   //What vertex did we travel from to this index
+        shortestDistanceToVertex = new int[V];    //Shortest distance to reach this vertex
+        previousVertex = new int[V];   //What vertex did we travel from to this index
         Set<Integer> visited = new HashSet<>();  //List of vertex id we have visited
         for (int i = 0; i < V; i++) {
-            dist[i] = Integer.MAX_VALUE;
-            prev[i] = -1;
+            shortestDistanceToVertex[i] = Integer.MAX_VALUE;
+            previousVertex[i] = -1;
         }
-        dist[start] = 0;
+        shortestDistanceToVertex[start] = 0;
 
         Queue<Edge> places = new PriorityQueue<>();
         places.add(new Edge(start, 0));
@@ -83,33 +83,33 @@ public class Graph {
             for (Edge edge: vertices.get(d).edges) {
                 if( !visited.contains(edge.dest))
                 {
-                    int newDist = dist[d] + edge.cost;
-                    if( newDist < dist[edge.dest]) {
-                        dist[edge.dest] = newDist;
-                        prev[edge.dest] = d;
+                    int newDist = shortestDistanceToVertex[d] + edge.cost;
+                    if( newDist < shortestDistanceToVertex[edge.dest]) {
+                        shortestDistanceToVertex[edge.dest] = newDist;
+                        previousVertex[edge.dest] = d;
                     }
-                    places.add(new Edge(edge.dest, dist[edge.dest]));
+                    places.add(new Edge(edge.dest, shortestDistanceToVertex[edge.dest]));
                 }
             }
         }
     }
 
     public List<Integer> shortestPathAsList(int dest) {
-        if( prev == null)
+        if( previousVertex == null)
             throw new IllegalStateException("Call to shortestPath before calculateShortestDistances");
         List<Integer> shortestPath = new ArrayList<>();
         shortestPath.add(dest);
-        int prevIndex = prev[dest];
+        int prevIndex = previousVertex[dest];
         while( prevIndex != -1){
             shortestPath.add(0,prevIndex);
-            prevIndex = prev[prevIndex];
+            prevIndex = previousVertex[prevIndex];
         }
         return shortestPath;
     }
 
     public int shortestPath(int dest) {
-        if( dist == null)
+        if( shortestDistanceToVertex == null)
             throw new IllegalStateException("Call to shortestPath before calculateShortestDistances");
-        return dist[dest];
+        return shortestDistanceToVertex[dest];
     }
 }
